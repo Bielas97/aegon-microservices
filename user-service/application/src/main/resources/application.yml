@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: user-service
+  data:
+    mongodb:
+      database: test_db
+      host: mongodb
+      port: 27017
+      auto-index-creation: true
+
+
+server:
+  port: 8100
+
+eureka:
+  client:
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://mongodb:8761/eureka

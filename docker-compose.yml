@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+
+  mongodb:
+    image: mongo
+    container_name: 'mongodb'
+    ports:
+      - '27017:27017'
+    volumes:
+      - aegon_mongodb_volume:/data/db
+    networks:
+      - aegon-network
+
+  eureka-server:
+    image: eureka-server
+    build:
+      context: ./eureka
+      dockerfile: Dockerfile
+    ports:
+      - '8761:8761'
+    networks:
+      - aegon-network
+
+  user-service:
+    image: user-service
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    ports:
+      - '8100:8100'
+    depends_on:
+      - mongodb
+      - eureka-server
+    networks:
+      - aegon-network
+
+#  bielawski-jakub-api-gateway:
+#    image: bielawski-jakub-api-gateway
+#    build:
+#      context: ./bielawski-jakub-api-gateway
+#      dockerfile: Dockerfile
+#    ports:
+#      - '8080:8080'
+#    depends_on:
+#      - bielawski-jakub-eureka-server
+#    networks:
+#      - bielawski-jakub-network
+
+networks:
+  aegon-network:
+
+volumes:
+  aegon_mongodb_volume:

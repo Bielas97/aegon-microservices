@@ -1,0 +1,112 @@
+{
+	"info": {
+		"_postman_id": "3630e71b-73f9-41bd-aca4-fac7a01d5b52",
+		"name": "aegon_user-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"bielasine\",\n    \"email\": \"dasdas@dasdd.pl\",\n    \"password\": \"123456\",\n    \"passwordConfirmation\": \"123456\",\n    \"roles\": [\n        \"ROLE_USERS_ADMIN\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8100/users/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"currentPassword\": \"1234567\",\n    \"newPassword\": \"123456\",\n    \"newPasswordConfirmation\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8100/users/6026923989a76306c2723aad/password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"users",
+						"6026923989a76306c2723aad",
+						"password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findByUsername",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8100/users/find/username/bielasine",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"users",
+						"find",
+						"username",
+						"bielasine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findById",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8100/users/find/id/6026923989a76306c2723aad",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"users",
+						"find",
+						"id",
+						"6026923989a76306c2723aad"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
