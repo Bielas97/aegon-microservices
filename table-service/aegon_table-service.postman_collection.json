@@ -1,0 +1,87 @@
+{
+	"info": {
+		"_postman_id": "371d263b-e893-4c7c-8f97-2339441fb161",
+		"name": "aegon_table-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add new Table",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"A02\",\n    \"maxPlaces\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8200/tables",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add customer to table",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"tableId\": \"6026def87d0a743f4a59b45c\",\n    \"customerId\": \"mojCustomerId\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8200/tables/customer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find by customer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/customer/mojCustomerId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"customer",
+						"mojCustomerId"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -35,6 +35,20 @@ services:
     networks:
       - aegon-network
 
+
+  table-service:
+    image: table-service
+    build:
+      context: ./table-service
+      dockerfile: Dockerfile
+    ports:
+      - '8200:8200'
+    depends_on:
+      - mongodb
+      - eureka-server
+    networks:
+      - aegon-network
+
 #  bielawski-jakub-api-gateway:
 #    image: bielawski-jakub-api-gateway
 #    build:
