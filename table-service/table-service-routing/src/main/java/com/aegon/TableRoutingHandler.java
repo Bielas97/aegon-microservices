@@ -4,6 +4,8 @@ import com.aegon.domain.AddCustomerToTableRequestDTO;
 import com.aegon.domain.AddNewTableRequestDTO;
 import com.aegon.domain.Table;
 import com.aegon.domain.TableDTO;
+import com.aegon.domain.TableId;
+import com.aegon.domain.TableName;
 import com.aegon.proxy.CustomerId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -40,5 +42,17 @@ public class TableRoutingHandler {
 		final var customerId = CustomerId.valueOf(request.pathVariable("customerId"));
 		final var tableMono = tableRepository.findByCustomer(customerId);
 		return toMonoServerResponse(tableMono);
+	}
+
+	public Mono<ServerResponse> findByName(ServerRequest request) {
+		final var name = TableName.valueOf(request.pathVariable("name"));
+		final var tableMono = tableRepository.findByName(name);
+		return toMonoServerResponse(tableMono);
+	}
+
+	public Mono<ServerResponse> deleteById(ServerRequest request) {
+		final var id = TableId.valueOf(request.pathVariable("tableId"));
+		final var idMono = tableRepository.delete(id);
+		return toMonoServerResponse(idMono);
 	}
 }

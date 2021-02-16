@@ -1,11 +1,10 @@
-package com.aegon.application;
+package com.aegon.infrastructure;
 
 import com.aegon.TableRepository;
 import com.aegon.domain.MongoKvTableDocument;
 import com.aegon.domain.Table;
 import com.aegon.domain.TableId;
 import com.aegon.domain.TableName;
-import com.aegon.infrastructure.MongoTableRepository;
 import com.aegon.proxy.CustomerId;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,22 +19,26 @@ public class TableRepositoryImpl implements TableRepository {
 
 	private final MongoTableRepository mongoRepository;
 
+	private final TableMapper mapper = TableMapper.getInstance();
+
 	@Override
 	public Mono<Table> findByName(TableName name) {
 		return mongoRepository.findByName(name.getInternal())
-				.map(this::map);
+				.map(mapper::map);
 	}
 
 	@Override
 	public Mono<Table> findByCustomer(CustomerId customerId) {
 		return mongoRepository.findByCustomerId(customerId.getInternal())
-				.map((this::map));
+				.map((mapper::map))
+				.switchIfEmpty(Mono.error(TableRepositoryException.of("Table not found")));
 	}
 
 	@Override
 	public Mono<Table> findById(TableId id) {
 		return mongoRepository.findById(id.getInternal())
-				.map(this::map);
+				.map(mapper::map)
+				.switchIfEmpty(Mono.error(TableRepositoryException.of("Table not found")));
 	}
 
 	@Override
@@ -45,35 +48,22 @@ public class TableRepositoryImpl implements TableRepository {
 				.maxPlaces(table.getMaxPlaces())
 				.customerIds(table.getCustomers().stream().map(CustomerId::getInternal).collect(Collectors.toSet()))
 				.build())
-				.map(this::map);
+				.map(mapper::map);
 	}
 
 	@Override
 	public Mono<TableId> delete(TableId id) {
-		return null;
+		return mongoRepository.deleteById(id.getInternal())
+				.flatMap(unused -> Mono.just(id));
 	}
 
 	@Override
 	public Mono<Table> update(Table table) {
-		return mongoRepository.save(map(table))
-				.map(this::map);
-	}
-
-	private Table map(MongoKvTableDocument document) {
-		return Table.builder()
-				.id(TableId.valueOf(document.getId()))
-				.name(TableName.valueOf(document.getName()))
-				.maxPlaces(document.getMaxPlaces())
-				.customers(document.getCustomerIds().stream().map(CustomerId::valueOf).collect(Collectors.toSet()))
-				.build();
-	}
-
-	private MongoKvTableDocument map(Table table) {
-		return MongoKvTableDocument.builder()
-				.id(table.getId().getInternal())
-				.name(table.getName().getInternal())
-				.maxPlaces(table.getMaxPlaces())
-				.customerIds(table.getCustomers().stream().map(CustomerId::getInternal).collect(Collectors.toSet()))
-				.build();
+		return mongoRepository.findById(table.getId().getInternal())
+				.flatMap(kvTable -> {
+					kvTable.update(table);
+					return mongoRepository.save(kvTable)
+							.map(mapper::map);
+				});
 	}
 }

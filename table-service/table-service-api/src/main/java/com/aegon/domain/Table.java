@@ -19,6 +19,8 @@ public class Table implements DomainObject<TableId> {
 
 	private final Integer maxPlaces;
 
+	private final SectorId sectorId;
+
 	private final Set<CustomerId> customers;
 
 	public Set<CustomerId> getCustomers() {

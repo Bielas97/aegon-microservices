@@ -8,10 +8,13 @@ public class AddNewTableRequestDTO {
 
 	public Integer maxPlaces;
 
+	public String sectorName;
+
 	public AddNewTableRequest toDomain() {
 		return AddNewTableRequest.builder()
 				.name(TableName.valueOf(name))
 				.maxPlaces(maxPlaces)
+				.sectorName(SectorName.valueOf(sectorName))
 				.build();
 	}
 
