@@ -13,6 +13,12 @@ public class AddNewTableRequest {
 
 	private final TableName name;
 
-	private final SectorName sectorName;
+	public AddNewTableRequest copyWithSector(SectorName sectorName) {
+		final TableName of = TableName.of(sectorName, name.getTableNumber());
+		return AddNewTableRequest.builder()
+				.maxPlaces(maxPlaces)
+				.name(of)
+				.build();
+	}
 
 }

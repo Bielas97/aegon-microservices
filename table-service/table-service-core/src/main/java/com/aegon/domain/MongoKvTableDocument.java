@@ -1,10 +1,11 @@
 package com.aegon.domain;
 
-import com.aegon.proxy.CustomerId;
 import com.aegon.util.lang.SimpleId;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,18 +27,21 @@ public class MongoKvTableDocument {
 	@Indexed(unique = true)
 	private String name;
 
+	@NotNull
 	private Integer maxPlaces;
 
+	@NotNull
 	private String sectorId;
 
-	private Set<String> customerIds;
+	@NotNull
+	private Set<String> customerIds = new HashSet<>();
 
 	public Set<String> getCustomerIds() {
 		return Set.copyOf(customerIds);
 	}
 
 	public void update(Table table) {
-		this.name = table.getName().getInternal();
+		this.name = table.getName().getStringValue();
 		this.maxPlaces = table.getMaxPlaces();
 		this.sectorId = table.getSectorId().getInternal();
 		this.customerIds = table.getCustomers().stream().map(SimpleId::getInternal).collect(Collectors.toSet());

@@ -31,6 +31,10 @@ public class MongoSectorDocument {
 	public void update(Sector sector) {
 		this.name = sector.getName().getInternal();
 		this.maxTables = sector.getMaxTables();
-		this.tableIds = sector.getTableIds().stream().map(SimpleId::getInternal).collect(Collectors.toSet());
+		updateTableIds(sector.getTableIds().stream().map(SimpleId::getInternal).collect(Collectors.toSet()));
+	}
+
+	private void updateTableIds(Set<String> tableIds) {
+		this.tableIds = tableIds;
 	}
 }

@@ -1,6 +1,7 @@
 package com.aegon.domain;
 
 import com.aegon.util.lang.DomainObject;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Builder;
@@ -25,12 +26,20 @@ public class Sector implements DomainObject<SectorId> {
 		this.tables.add(table);
 	}
 
+	public void addTables(Collection<Table> tables) {
+		this.tables.addAll(tables);
+	}
+
 	public void removeTable(TableId tableId) {
 		this.tables.removeIf(table -> table.getId().equals(tableId));
 	}
 
 	public Set<TableId> getTableIds() {
 		return tables.stream().map(Table::getId).collect(Collectors.toSet());
+	}
+
+	public Integer getTablesAmount() {
+		return tables.size();
 	}
 
 	@Override

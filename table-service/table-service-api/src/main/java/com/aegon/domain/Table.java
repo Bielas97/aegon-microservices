@@ -1,8 +1,10 @@
 package com.aegon.domain;
 
 import com.aegon.proxy.CustomerId;
+import com.aegon.requests.UpdateTableRequest;
 import com.aegon.util.lang.DomainObject;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -35,10 +37,12 @@ public class Table implements DomainObject<TableId> {
 		this.customers.remove(id);
 	}
 
-	public Table update(TableName name, Collection<CustomerId> customers) {
+	public Table update(UpdateTableRequest request) {
 		return Table.builder()
 				.id(id)
-				.name(name)
+				.name(request.getTableName())
+				.maxPlaces(request.getMaxPlaces())
+				.sectorId(request.getSectorId())
 				.customers(Set.copyOf(customers))
 				.build();
 	}

@@ -1,6 +1,7 @@
 package com.aegon.domain;
 
 import com.aegon.requests.AddNewTableRequest;
+import java.util.StringJoiner;
 
 public class AddNewTableRequestDTO {
 
@@ -11,10 +12,10 @@ public class AddNewTableRequestDTO {
 	public String sectorName;
 
 	public AddNewTableRequest toDomain() {
+		final StringJoiner fullTableName = new StringJoiner("@", sectorName, name);
 		return AddNewTableRequest.builder()
-				.name(TableName.valueOf(name))
+				.name(TableName.from(fullTableName.toString()))
 				.maxPlaces(maxPlaces)
-				.sectorName(SectorName.valueOf(sectorName))
 				.build();
 	}
 

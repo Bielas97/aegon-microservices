@@ -1,6 +1,6 @@
 package com.aegon.infrastructure;
 
-import com.aegon.TableRepository;
+import com.aegon.application.TableRepository;
 import com.aegon.domain.MongoKvTableDocument;
 import com.aegon.domain.Table;
 import com.aegon.domain.TableId;
@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -23,7 +24,7 @@ public class TableRepositoryImpl implements TableRepository {
 
 	@Override
 	public Mono<Table> findByName(TableName name) {
-		return mongoRepository.findByName(name.getInternal())
+		return mongoRepository.findByName(name.getStringValue())
 				.map(mapper::map);
 	}
 
@@ -35,6 +36,12 @@ public class TableRepositoryImpl implements TableRepository {
 	}
 
 	@Override
+	public Flux<Table> findAll() {
+		return mongoRepository.findAll()
+				.map(mapper::map);
+	}
+
+	@Override
 	public Mono<Table> findById(TableId id) {
 		return mongoRepository.findById(id.getInternal())
 				.map(mapper::map)
@@ -43,10 +50,12 @@ public class TableRepositoryImpl implements TableRepository {
 
 	@Override
 	public Mono<Table> save(Table table) {
+		final String stringValue = table.getName().getStringValue();
 		return mongoRepository.save(MongoKvTableDocument.builder()
-				.name(table.getName().getInternal())
+				.name(stringValue)
 				.maxPlaces(table.getMaxPlaces())
 				.customerIds(table.getCustomers().stream().map(CustomerId::getInternal).collect(Collectors.toSet()))
+				.sectorId(table.getSectorId().getInternal())
 				.build())
 				.map(mapper::map);
 	}

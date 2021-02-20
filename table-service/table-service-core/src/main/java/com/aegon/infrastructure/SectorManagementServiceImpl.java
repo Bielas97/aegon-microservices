@@ -1,14 +1,17 @@
 package com.aegon.infrastructure;
 
-import com.aegon.SectorManagementService;
-import com.aegon.SectorRepository;
-import com.aegon.TableRepository;
+import com.aegon.application.SectorManagementService;
+import com.aegon.application.SectorRepository;
+import com.aegon.application.TableRepository;
 import com.aegon.domain.Sector;
 import com.aegon.domain.TableId;
 import com.aegon.requests.AddNewSectorRequest;
 import com.aegon.requests.AddTableToSectorRequest;
 import com.aegon.requests.AddTablesToSectorRequest;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -28,6 +31,17 @@ public class SectorManagementServiceImpl implements SectorManagementService {
 				.name(request.name())
 				.maxTables(request.maxTables())
 				.build());
+	}
+
+	@Override
+	public Flux<Sector> addNewSectors(Collection<AddNewSectorRequest> requests) {
+		final Set<Sector> sectors = requests.stream().map(request -> Sector.builder()
+				.name(request.name())
+				.maxTables(request.maxTables())
+				.tables(new HashSet<>())
+				.build())
+				.collect(Collectors.toSet());
+		return sectorRepository.saveAll(sectors);
 	}
 
 	@Override

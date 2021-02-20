@@ -1,6 +1,6 @@
 package com.aegon.application;
 
-import com.aegon.SectorRepository;
+import com.aegon.infrastructure.SectorRepositoryException;
 import com.aegon.requests.AddNewTableRequest;
 import com.aegon.util.lang.Preconditions;
 import reactor.core.publisher.Mono;
@@ -18,13 +18,15 @@ public class AddNewTableValidator implements TableValidator {
 
 	@Override
 	public void validate() {
-		final var sectorId = request.getSectorId();
-		sectorRepository.findById(sectorId)
+		//TODO test it
+		final var sectorName = request.getName().getSectorName();
+		sectorRepository.findByName(sectorName)
 				.flatMap(sector -> {
-					if (sector.getTables().size() >= sector.getMaxTables()) {
+					if (sector.getTablesAmount() >= sector.getMaxTables()) {
 						return Mono.error(TooManyTablesInSectorException.tooMany());
 					}
 					return Mono.empty();
-				});
+				})
+				.switchIfEmpty(Mono.error(SectorRepositoryException.of("Sector not found")));
 	}
 }

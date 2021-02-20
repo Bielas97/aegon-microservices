@@ -1,6 +1,5 @@
 package com.aegon.application;
 
-import com.aegon.SectorRepository;
 import com.aegon.requests.AddNewTableRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

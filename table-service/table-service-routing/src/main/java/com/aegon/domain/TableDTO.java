@@ -19,7 +19,7 @@ public class TableDTO {
 	public static TableDTO from(Table table) {
 		return TableDTO.builder()
 				.tableId(table.getId().getInternal())
-				.name(table.getName().getInternal())
+				.name(table.getName().getStringValue())
 				.maxPlaces(table.getMaxPlaces())
 				.customers(table.getCustomers().stream().map(CustomerId::getInternal).collect(Collectors.toSet()))
 				.build();
