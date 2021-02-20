@@ -36,12 +36,6 @@ public class TableRepositoryImpl implements TableRepository {
 	}
 
 	@Override
-	public Flux<Table> findAll() {
-		return mongoRepository.findAll()
-				.map(mapper::map);
-	}
-
-	@Override
 	public Mono<Table> findById(TableId id) {
 		return mongoRepository.findById(id.getInternal())
 				.map(mapper::map)
