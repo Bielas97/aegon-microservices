@@ -1,10 +1,10 @@
 package com.aegon.application.generator;
 
 import com.aegon.requests.AddNewTableRequest;
-import reactor.core.publisher.Flux;
+import java.util.List;
 
 @FunctionalInterface
-interface FileParser {
+interface DataBufferParser {
 
-	Flux<AddNewTableRequest> parse();
+	List<AddNewTableRequest> parse();
 }

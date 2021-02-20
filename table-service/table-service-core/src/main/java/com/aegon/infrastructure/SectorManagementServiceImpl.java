@@ -1,8 +1,8 @@
 package com.aegon.infrastructure;
 
-import com.aegon.application.SectorManagementService;
-import com.aegon.application.SectorRepository;
-import com.aegon.application.TableRepository;
+import com.aegon.SectorManagementService;
+import com.aegon.SectorRepository;
+import com.aegon.TableRepository;
 import com.aegon.domain.Sector;
 import com.aegon.domain.TableId;
 import com.aegon.requests.AddNewSectorRequest;

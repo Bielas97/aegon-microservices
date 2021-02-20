@@ -20,7 +20,8 @@ public class TableRouting {
 		return nest(
 				path("/tables"),
 				route(POST("").and(accept(MediaType.APPLICATION_JSON)), routingHandler::addTable)
-						.andRoute(POST("/generate").and(accept(MediaType.APPLICATION_JSON)), routingHandler::generateTables)
+						.andRoute(POST("/generate").and(accept(MediaType.APPLICATION_JSON)), routingHandler::generateDefaultTables)
+						.andRoute(POST("/file").and(accept(MediaType.MULTIPART_FORM_DATA)), routingHandler::generateTables)
 						.andRoute(POST("/customer").and(accept(MediaType.APPLICATION_JSON)), routingHandler::addCustomer)
 						.andRoute(GET("/customer/{customerId}").and(accept(MediaType.APPLICATION_JSON)), routingHandler::findByCustomer)
 		)

@@ -1,5 +1,6 @@
 package com.aegon.application;
 
+import com.aegon.SectorRepository;
 import com.aegon.infrastructure.SectorRepositoryException;
 import com.aegon.requests.AddNewTableRequest;
 import com.aegon.util.lang.Preconditions;

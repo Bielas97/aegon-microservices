@@ -1,7 +1,7 @@
 package com.aegon.infrastructure;
 
-import com.aegon.application.SectorRepository;
-import com.aegon.application.TableRepository;
+import com.aegon.SectorRepository;
+import com.aegon.TableRepository;
 import com.aegon.domain.MongoSectorDocument;
 import com.aegon.domain.Sector;
 import com.aegon.domain.SectorId;

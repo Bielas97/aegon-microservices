@@ -1,4 +1,4 @@
-package com.aegon.application;
+package com.aegon;
 
 import com.aegon.domain.Table;
 import com.aegon.requests.AddCustomerToTableRequest;

@@ -1,10 +1,11 @@
 package com.aegon.application.generator;
 
-import com.aegon.application.SectorManagementService;
-import com.aegon.application.SectorRepository;
+import com.aegon.SectorManagementService;
+import com.aegon.SectorRepository;
+import com.aegon.TableManagementService;
+import com.aegon.TableRepository;
+import com.aegon.application.SupportedFileExtension;
 import com.aegon.application.TableGenerator;
-import com.aegon.application.TableManagementService;
-import com.aegon.application.TableRepository;
 import com.aegon.domain.Sector;
 import com.aegon.domain.SectorId;
 import com.aegon.domain.SectorName;
@@ -12,19 +13,24 @@ import com.aegon.domain.Table;
 import com.aegon.requests.AddNewSectorRequest;
 import com.aegon.requests.AddNewTableRequest;
 import com.aegon.util.lang.Preconditions;
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service
 public class TableGeneratorImpl implements TableGenerator {
 
-	private final FileParserFactory fileParserFactory;
+	@Value("classpath:tables/DefaultTables.csv")
+	private Resource resourceFile;
 
 	private final TableManagementService tableManagementService;
 
@@ -34,10 +40,9 @@ public class TableGeneratorImpl implements TableGenerator {
 
 	private final TableRepository tableRepository;
 
-	public TableGeneratorImpl(FileParserFactory fileParserFactory, TableManagementService tableManagementService,
+	public TableGeneratorImpl(TableManagementService tableManagementService,
 			SectorManagementService sectorManagementService,
 			SectorRepository sectorRepository, TableRepository tableRepository) {
-		this.fileParserFactory = Preconditions.requireNonNull(fileParserFactory);
 		this.tableManagementService = Preconditions.requireNonNull(tableManagementService);
 		this.sectorManagementService = Preconditions.requireNonNull(sectorManagementService);
 		this.sectorRepository = Preconditions.requireNonNull(sectorRepository);
@@ -45,21 +50,26 @@ public class TableGeneratorImpl implements TableGenerator {
 	}
 
 	@Override
-	public Flux<Table> generate(File file) {
-		final Flux<AddNewTableRequest> tableRequestFlux = fileParserFactory.create(file).parse();
-		return saveTablesAndSectors(tableRequestFlux);
+	public Flux<Table> generate(DataBuffer dataBuffer, SupportedFileExtension extension) {
+		final List<AddNewTableRequest> requestFlux = DataBufferParserFactory.create(dataBuffer, extension).parse();
+		return saveTablesAndSectors(requestFlux);
 	}
 
 	@Override
 	public Flux<Table> generateDefault() {
-		final Flux<AddNewTableRequest> tableRequestFlux = fileParserFactory.defaultParser().parse();
-		return saveTablesAndSectors(tableRequestFlux);
-
+		final Flux<DataBuffer> read = takeResource(resourceFile);
+		return read.flatMap(dataBuffer -> generate(dataBuffer, SupportedFileExtension.CSV));
 	}
 
-	private Flux<Table> saveTablesAndSectors(Flux<AddNewTableRequest> requestFlux) {
-		final Flux<Sector> sectorFlux = saveSectorsWithoutTableIds(requestFlux);
-		final Flux<Table> tableFlux = saveTablesWithSectorIds(requestFlux, sectorFlux);
+	private Flux<DataBuffer> takeResource(Resource resource) {
+		return DataBufferUtils.read(resource,
+				new DefaultDataBufferFactory(),
+				4096);
+	}
+
+	private Flux<Table> saveTablesAndSectors(List<AddNewTableRequest> requests) {
+		final Flux<Sector> sectorFlux = saveSectorsWithoutTableIds(requests);
+		final Flux<Table> tableFlux = saveTablesWithSectorIds(requests, sectorFlux);
 		final Flux<Sector> sectorWithTableIdsFlux = saveTableIdsInSectors(tableFlux);
 		return extractTablesFromSectors(sectorWithTableIdsFlux);
 	}
@@ -87,9 +97,9 @@ public class TableGeneratorImpl implements TableGenerator {
 		return tables.stream().collect(Collectors.groupingBy(Table::getSectorId));
 	}
 
-	private Flux<Table> saveTablesWithSectorIds(Flux<AddNewTableRequest> requestFlux, Flux<Sector> sectorFlux) {
-		return requestFlux.collectList().zipWith(sectorFlux.collectList())
-				.flatMapMany(tuple -> saveTablesWithSectorIds(tuple.getT1()));
+	private Flux<Table> saveTablesWithSectorIds(List<AddNewTableRequest> requestFlux, Flux<Sector> sectorFlux) {
+		return sectorFlux.collectList()
+				.flatMapMany(request -> saveTablesWithSectorIds(requestFlux));
 	}
 
 	private Flux<Table> saveTablesWithSectorIds(List<AddNewTableRequest> tableRequests) {
@@ -106,11 +116,9 @@ public class TableGeneratorImpl implements TableGenerator {
 				.collect(Collectors.groupingBy(table -> table.getName().getSectorName()));
 	}
 
-	private Flux<Sector> saveSectorsWithoutTableIds(Flux<AddNewTableRequest> requestFlux) {
-		return requestFlux.collectList().flatMapMany(tableRequests -> {
-			final Set<AddNewSectorRequest> sectorRequests = mapToSectorRequests(tableRequests);
-			return sectorManagementService.addNewSectors(sectorRequests);
-		});
+	private Flux<Sector> saveSectorsWithoutTableIds(List<AddNewTableRequest> tableRequests) {
+		final Set<AddNewSectorRequest> sectorRequests = mapToSectorRequests(tableRequests);
+		return sectorManagementService.addNewSectors(sectorRequests);
 	}
 
 	private Set<AddNewSectorRequest> mapToSectorRequests(List<AddNewTableRequest> tableRequests) {

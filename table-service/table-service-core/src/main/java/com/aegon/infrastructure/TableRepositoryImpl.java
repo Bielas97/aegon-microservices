@@ -1,6 +1,6 @@
 package com.aegon.infrastructure;
 
-import com.aegon.application.TableRepository;
+import com.aegon.TableRepository;
 import com.aegon.domain.MongoKvTableDocument;
 import com.aegon.domain.Table;
 import com.aegon.domain.TableId;

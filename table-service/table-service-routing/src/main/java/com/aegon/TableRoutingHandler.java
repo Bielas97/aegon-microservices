@@ -1,9 +1,7 @@
 package com.aegon;
 
-import com.aegon.application.SectorRepository;
+import com.aegon.application.SupportedFileExtension;
 import com.aegon.application.TableGenerator;
-import com.aegon.application.TableManagementService;
-import com.aegon.application.TableRepository;
 import com.aegon.domain.AddCustomerToTableRequestDTO;
 import com.aegon.domain.AddNewTableRequestDTO;
 import com.aegon.domain.Sector;
@@ -16,6 +14,7 @@ import com.aegon.proxy.CustomerId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -75,11 +74,26 @@ public class TableRoutingHandler {
 		return toMonoServerResponse(idMono);
 	}
 
-	public Mono<ServerResponse> generateTables(ServerRequest request) {
+	public Mono<ServerResponse> generateDefaultTables(ServerRequest request) {
 		final Flux<Table> tableFlux = generator.generateDefault();
+		return ServerResponse.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON)
+				.body(tableFlux, Table.class);
+	}
+
+	public Mono<ServerResponse> generateTables(ServerRequest request) {
+		final Flux<Table> tableFlux = request.multipartData()
+				.flatMapIterable(partsMap -> partsMap.get("file"))
+				.map(part -> (FilePart) part)
+				.flatMap(this::generateTables);
 
 		return ServerResponse.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON)
 				.body(tableFlux, Table.class);
+	}
+
+	private Flux<Table> generateTables(FilePart part) {
+		final String filename = part.filename();
+		final SupportedFileExtension extension = SupportedFileExtension.from(filename.substring(filename.lastIndexOf(".") + 1));
+		return part.content().flatMap(dataBuffer -> generator.generate(dataBuffer, extension));
 	}
 
 }
