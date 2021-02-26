@@ -42,6 +42,17 @@ public class Sector implements DomainObject<SectorId> {
 		return tables.size();
 	}
 
+	private Integer numberOfFreePlaces() {
+		return maxTables - tables.size();
+	}
+
+	public boolean isAnyPlaceLeft() {
+		if (numberOfFreePlaces() < 0) {
+			throw SectorFreePlacesException.err();
+		}
+		return numberOfFreePlaces() > 0;
+	}
+
 	@Override
 	public SectorId getId() {
 		return id;

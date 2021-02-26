@@ -34,6 +34,10 @@ public class MongoSectorDocument {
 		updateTableIds(sector.getTableIds().stream().map(SimpleId::getInternal).collect(Collectors.toSet()));
 	}
 
+	public void removeTable(String tableId) {
+		this.tableIds.remove(tableId);
+	}
+
 	private void updateTableIds(Set<String> tableIds) {
 		this.tableIds = tableIds;
 	}

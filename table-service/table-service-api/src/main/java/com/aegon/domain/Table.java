@@ -3,8 +3,6 @@ package com.aegon.domain;
 import com.aegon.proxy.CustomerId;
 import com.aegon.requests.UpdateTableRequest;
 import com.aegon.util.lang.DomainObject;
-import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -29,8 +27,27 @@ public class Table implements DomainObject<TableId> {
 		return Set.copyOf(customers);
 	}
 
+	public boolean hasCustomer(CustomerId id) {
+		return this.customers.contains(id);
+	}
+
 	public void addCustomer(CustomerId id) {
 		this.customers.add(id);
+	}
+
+	public void removeCustomer(CustomerId id) {
+		this.customers.remove(id);
+	}
+
+	private Integer numberOfFreePlaces() {
+		return maxPlaces - customers.size();
+	}
+
+	public boolean isAnyPlaceLeft() {
+		if (numberOfFreePlaces() < 0) {
+			throw TableFreePlacesException.err();
+		}
+		return numberOfFreePlaces() > 0;
 	}
 
 	public void deleteCustomer(CustomerId id) {

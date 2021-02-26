@@ -9,6 +9,8 @@ public interface MongoTableRepository extends ReactiveMongoRepository<MongoKvTab
 
 	Mono<MongoKvTableDocument> findByName(String name);
 
+	Mono<Long> deleteByName(String name);
+
 	@Query(value = "{ 'customerIds': { $in: [?0] } }")
 	Mono<MongoKvTableDocument> findByCustomerId(String customerId);
 

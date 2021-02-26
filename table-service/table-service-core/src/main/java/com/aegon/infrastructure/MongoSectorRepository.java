@@ -8,4 +8,6 @@ public interface MongoSectorRepository extends ReactiveMongoRepository<MongoSect
 
 	Mono<MongoSectorDocument> findByName(String name);
 
+	Mono<Long> deleteByName(String name);
+
 }

@@ -14,4 +14,6 @@ public interface SectorRepository extends DomainReactiveRepository<SectorId, Sec
 
 	Flux<Sector> saveAll(Collection<Sector> sectors);
 
+	Mono<SectorName> deleteByName(SectorName name);
+
 }

@@ -8,18 +8,21 @@ import lombok.Builder;
 @Builder
 public class TableDTO {
 
-	public String tableId;
+	public String id;
 
 	public String name;
 
 	public Integer maxPlaces;
 
+	public String sectorId;
+
 	public Set<String> customers;
 
 	public static TableDTO from(Table table) {
 		return TableDTO.builder()
-				.tableId(table.getId().getInternal())
+				.id(table.getId().getInternal())
 				.name(table.getName().getStringValue())
+				.sectorId(table.getSectorId().getInternal())
 				.maxPlaces(table.getMaxPlaces())
 				.customers(table.getCustomers().stream().map(CustomerId::getInternal).collect(Collectors.toSet()))
 				.build();

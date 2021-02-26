@@ -1,6 +1,8 @@
 package com.aegon;
 
 import com.aegon.domain.Sector;
+import com.aegon.domain.SectorId;
+import com.aegon.domain.SectorName;
 import com.aegon.requests.AddNewSectorRequest;
 import com.aegon.requests.AddTableToSectorRequest;
 import com.aegon.requests.AddTablesToSectorRequest;
@@ -17,5 +19,9 @@ public interface SectorManagementService {
 	Mono<Sector> addTableToSector(AddTableToSectorRequest request);
 
 	Mono<Sector> addTablesToSector(AddTablesToSectorRequest request);
+
+	Mono<SectorId> delete(SectorId sectorId);
+
+	Mono<SectorId> deleteByName(SectorName name);
 
 }

@@ -3,7 +3,6 @@ package com.aegon.infrastructure;
 import com.aegon.SectorRepository;
 import com.aegon.TableManagementService;
 import com.aegon.TableRepository;
-import com.aegon.application.TableValidatorFactory;
 import com.aegon.domain.Sector;
 import com.aegon.domain.SectorName;
 import com.aegon.domain.Table;
@@ -26,21 +25,17 @@ public class TableManagementServiceImpl implements TableManagementService {
 
 	private final TableRepository tableRepository;
 
-	private final TableValidatorFactory validatorFactory;
-
 	@Override
 	public Mono<Table> addNewTable(AddNewTableRequest request) {
-		validateRequests(request);
 		final var sectorMono = sectorRepository.findByName(request.getName().getSectorName());
 		return addTableWithSector(request, sectorMono);
 	}
 
 	@Override
 	public Flux<Table> addNewTables(Set<AddNewTableRequest> requests) {
-		validateRequests(requests.toArray(new AddNewTableRequest[0]));
 		final var sectorNames = mapToSectorNames(requests);
 		final Flux<Sector> sectorsFlux = findSectors(sectorNames);
-		return addTablesLinkedWithSectors(requests, sectorsFlux);
+		return addTablesWithSectors(requests, sectorsFlux);
 	}
 
 	@Override
@@ -49,14 +44,35 @@ public class TableManagementServiceImpl implements TableManagementService {
 		return addCustomerToTable(request.getCustomerId(), tableMono);
 	}
 
-	private Mono<Table> addCustomerToTable(CustomerId customerId, Mono<Table> tableMono) {
-		return tableMono.flatMap(table -> {
-			table.addCustomer(customerId);
-			return tableRepository.update(table);
-		});
+	@Override
+	public Mono<Table> removeCustomer(CustomerId customerId) {
+		return tableRepository.findByCustomer(customerId)
+				.flatMap(table -> {
+					table.removeCustomer(customerId);
+					return tableRepository.update(table);
+				});
 	}
 
-	private Flux<Table> addTablesLinkedWithSectors(Set<AddNewTableRequest> requests, Flux<Sector> sectorsFlux) {
+	private Mono<Table> addCustomerToTable(CustomerId customerId, Mono<Table> tableMono) {
+		return tableMono.flatMap(table -> addCustomerToTable(customerId, table));
+	}
+
+	private Mono<Table> addCustomerToTable(CustomerId customerId, Table table) {
+		validateCustomerAddition(customerId, table);
+		table.addCustomer(customerId);
+		return tableRepository.update(table);
+	}
+
+	private void validateCustomerAddition(CustomerId customerId, Table table) {
+		if (table.hasCustomer(customerId)) {
+			throw TableAlreadyHasCustomer.err();
+		}
+		if (!table.isAnyPlaceLeft()) {
+			throw TableNoMorePlacesLeft.err();
+		}
+	}
+
+	private Flux<Table> addTablesWithSectors(Set<AddNewTableRequest> requests, Flux<Sector> sectorsFlux) {
 		return sectorsFlux.flatMap(sector -> Flux.fromIterable(requests)
 				.filter(request -> isRequestWithSector(request, sector))
 				.flatMap(request -> {
@@ -65,16 +81,27 @@ public class TableManagementServiceImpl implements TableManagementService {
 				}));
 	}
 
-	private void validateRequests(AddNewTableRequest... requests) {
-		for (AddNewTableRequest request : requests) {
-			validatorFactory.of(request).validate();
-		}
-	}
-
 	private Mono<Table> addTableWithSector(AddNewTableRequest request, Mono<Sector> sectorMono) {
 		return sectorMono.flatMap(sector -> {
-			final var table = createNewTable(request, sector);
-			return tableRepository.save(table);
+			final Mono<Table> tableMono = saveTable(request, sector);
+			return assignTableToSector(tableMono, sector);
+		});
+	}
+
+	private Mono<Table> saveTable(AddNewTableRequest request, Sector sector) {
+		if (!sector.isAnyPlaceLeft()) {
+			throw SectorNoMorePlacesLeft.err();
+		}
+		final var table = createNewTable(request, sector);
+		final Mono<Table> tableMono = tableRepository.save(table);
+		return tableMono;
+	}
+
+	private Mono<Table> assignTableToSector(Mono<Table> tableMono, Sector sector) {
+		return tableMono.flatMap(table -> {
+			sector.addTable(table);
+			return sectorRepository.update(sector)
+					.then(Mono.just(table));
 		});
 	}
 

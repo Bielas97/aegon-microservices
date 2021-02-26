@@ -12,9 +12,10 @@ public class AddNewTableRequestDTO {
 	public String sectorName;
 
 	public AddNewTableRequest toDomain() {
-		final StringJoiner fullTableName = new StringJoiner("@", sectorName, name);
+		final StringJoiner fullTableNameJoiner = new StringJoiner("@");
+		fullTableNameJoiner.add(sectorName).add(name);
 		return AddNewTableRequest.builder()
-				.name(TableName.from(fullTableName.toString()))
+				.name(TableName.from(fullTableNameJoiner.toString()))
 				.maxPlaces(maxPlaces)
 				.build();
 	}

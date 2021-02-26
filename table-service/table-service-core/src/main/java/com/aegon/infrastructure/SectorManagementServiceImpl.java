@@ -4,6 +4,8 @@ import com.aegon.SectorManagementService;
 import com.aegon.SectorRepository;
 import com.aegon.TableRepository;
 import com.aegon.domain.Sector;
+import com.aegon.domain.SectorId;
+import com.aegon.domain.SectorName;
 import com.aegon.domain.TableId;
 import com.aegon.requests.AddNewSectorRequest;
 import com.aegon.requests.AddTableToSectorRequest;
@@ -54,6 +56,23 @@ public class SectorManagementServiceImpl implements SectorManagementService {
 	public Mono<Sector> addTablesToSector(AddTablesToSectorRequest request) {
 		return sectorRepository.findById(request.sectorId())
 				.flatMap(sector -> addTablesTo(sector, request.tables()));
+	}
+
+	@Override
+	public Mono<SectorId> delete(SectorId sectorId) {
+		return sectorRepository.findById(sectorId)
+				.flatMapIterable(Sector::getTableIds)
+				.flatMap(tableRepository::findById)
+				.flatMap(table -> tableRepository.delete(table.getId()))
+				.collectList()
+				.flatMap(unused -> sectorRepository.delete(sectorId));
+	}
+
+	@Override
+	public Mono<SectorId> deleteByName(SectorName name) {
+		return sectorRepository.findByName(name)
+				.map(Sector::getId)
+				.flatMap(this::delete);
 	}
 
 	private Mono<Sector> addTableTo(Sector sector, TableId tableId) {

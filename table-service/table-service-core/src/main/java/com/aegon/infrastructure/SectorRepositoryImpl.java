@@ -29,7 +29,7 @@ public class SectorRepositoryImpl implements SectorRepository {
 	public Mono<Sector> findByName(SectorName name) {
 		final var sectorMono = mongoSectorRepository.findByName(name.getInternal());
 		return mapper.map(sectorMono)
-				.switchIfEmpty(Mono.error(SectorRepositoryException.of("Sector not found")));
+				.switchIfEmpty(Mono.error(SectorRepositoryException.of(String.format("Sector with name %s not found", name.getInternal()))));
 	}
 
 	@Override
@@ -44,25 +44,23 @@ public class SectorRepositoryImpl implements SectorRepository {
 		return mongoSectorDocumentFlux.flatMap(document -> {
 			final Mono<MongoSectorDocument> documentMono = Mono.just(document);
 			return mapper.map(documentMono);
-		});
+		})
+				.switchIfEmpty(Mono.error(SectorRepositoryException.of(String.format("Sectors with ids %s could not be saved",
+						documents.stream().map(MongoSectorDocument::getId).collect(Collectors.toList())))));
+	}
+
+	@Override
+	public Mono<SectorName> deleteByName(SectorName name) {
+		return mongoSectorRepository.deleteByName(name.getInternal())
+				.map(unused -> name)
+				.switchIfEmpty(Mono.error(SectorRepositoryException.of(String.format("Sector with name %s not found", name.getInternal()))));
 	}
 
 	@Override
 	public Mono<Sector> findById(SectorId id) {
 		final var sectorMono = mongoSectorRepository.findById(id.getInternal());
 		return mapper.map(sectorMono)
-				.onErrorResume(e -> {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				})
-				.onErrorContinue((e, d) -> {
-					e.printStackTrace();
-					d.toString();
-				})
-				.doOnError(e -> {
-					e.printStackTrace();
-				});
-		//				.switchIfEmpty(Mono.error(SectorRepositoryException.of("Sector not found")));
+				.switchIfEmpty(Mono.error(SectorRepositoryException.of(String.format("Sector with id %s not found", id.getInternal()))));
 	}
 
 	@Override
@@ -72,14 +70,15 @@ public class SectorRepositoryImpl implements SectorRepository {
 				.maxTables(sector.getMaxTables())
 				.tableIds(sector.getTableIds().stream().map(SimpleId::getInternal).collect(Collectors.toSet()))
 				.build();
-		final var saved = mongoSectorRepository.save(document);
+		final var saved = mongoSectorRepository.save(document)
+				.switchIfEmpty(Mono.error(SectorRepositoryException.of(String.format("Sector with name %s coudl not be saved", sector.getName().getInternal()))));
 		return mapper.map(saved);
 	}
 
 	@Override
 	public Mono<SectorId> delete(SectorId id) {
-		return mongoSectorRepository.deleteById(id.getInternal())
-				.flatMap(unused -> Mono.just(id));
+		return mongoSectorRepository.findById(id.getInternal())
+				.flatMap(document -> mongoSectorRepository.delete(document).then(Mono.just(SectorId.valueOf(document.getId()))));
 	}
 
 	@Override
@@ -87,15 +86,9 @@ public class SectorRepositoryImpl implements SectorRepository {
 		return mongoSectorRepository.findById(sector.getId().getInternal())
 				.flatMap(document -> {
 					document.update(sector);
-					final var updated = mongoSectorRepository.save(document)
-							.switchIfEmpty(Mono.defer(() -> {
-								throw new RuntimeException("mono empty");
-							}));
+					final var updated = mongoSectorRepository.save(document);
 					return mapper.map(updated);
 				})
-				.onErrorResume(e -> {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				});
+				.switchIfEmpty(Mono.error(SectorRepositoryException.of(String.format("Sector with id %s could not be updated", sector.getId().getInternal()))));
 	}
 }

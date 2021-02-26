@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"A02\",\n    \"maxPlaces\": 10\n}",
+					"raw": "{\n    \"name\": \"22\",\n    \"maxPlaces\": 10,\n    \"sectorName\": \"A0\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -40,7 +40,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"tableId\": \"6026def87d0a743f4a59b45c\",\n    \"customerId\": \"mojCustomerId\"\n}",
+					"raw": "{\n    \"tableId\": \"60393ac63cdb6d25aeb4925f\",\n    \"customerId\": \"mojCustomerId\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -64,6 +64,232 @@
 		},
 		{
 			"name": "Find by customer",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/customer/mojCustomerId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"customer",
+						"mojCustomerId"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "generate from file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/jakub.bielawski/Documents/programming/aegon-microservices/table-service/application/src/main/resources/tables/DefaultTables.csv",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8200/tables/generate?default=true",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"generate"
+					],
+					"query": [
+						{
+							"key": "default",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find tables in Sector by sector name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/sectors/A0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"sectors",
+						"A0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find  Sector by sector name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/sectors/sector/A1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"sectors",
+						"sector",
+						"A1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete table by table name",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/name/A0@6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"name",
+						"A0@6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete table by table id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/60392537a259dd0bb6e3f37e",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"60392537a259dd0bb6e3f37e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find table by table name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/B0@1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"B0@1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete sector with its tables by id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/sectors/60393668ef4e5a7f891a9659",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"sectors",
+						"60393668ef4e5a7f891a9659"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete sector with its names by name ",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/sectors/name/A0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"sectors",
+						"name",
+						"A0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete customer from table",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8200/tables/customer/mojCustomerId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"tables",
+						"customer",
+						"mojCustomerId"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "find table with customer",
 			"request": {
 				"method": "GET",
 				"header": [],

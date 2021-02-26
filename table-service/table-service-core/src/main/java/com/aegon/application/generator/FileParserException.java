@@ -3,7 +3,7 @@ package com.aegon.application.generator;
 import com.aegon.util.lang.exception.BaseException;
 import com.aegon.util.lang.exception.ExceptionError;
 
-public class FileParserException extends BaseException {
+class FileParserException extends BaseException {
 
 	private FileParserException(String msg) {
 		super(new ExceptionError(msg));
