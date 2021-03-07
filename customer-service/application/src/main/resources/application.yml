@@ -17,3 +17,8 @@ eureka:
     registerWithEureka: true
     serviceUrl:
       defaultZone: http://eureka-server:8761/eureka
+
+aegon:
+  email:
+    email: bielaspol@gmail.com
+    password: rodzinakb1997

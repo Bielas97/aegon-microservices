@@ -123,8 +123,8 @@ class TableRoutingHandler {
 				.map(Boolean::valueOf)
 				.orElse(Boolean.FALSE);
 		final var tablesFlux = isDefaultGeneration ? tableGenerator.generateDefault() : generate(request);
-		return ServerResponse.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON)
-				.body(tablesFlux.map(TableDTO::from), Table.class);
+		final Flux<TableDTO> resultFlux = tablesFlux.map(TableDTO::from);
+		return toMonoServerResponse(resultFlux, TableDTO.class);
 	}
 
 	private Flux<Table> generate(ServerRequest request) {

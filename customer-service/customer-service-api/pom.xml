@@ -9,7 +9,7 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>customer-service-routing</artifactId>
+	<artifactId>customer-service-api</artifactId>
 
 	<properties>
 		<maven.compiler.source>15</maven.compiler.source>
@@ -24,14 +24,9 @@
 		</dependency>
 		<!--	===================== AEGON ==========================================================================	-->
 		<dependency>
-			<groupId>com.aegon.util.spring.webflux</groupId>
-			<artifactId>spring-webflux</artifactId>
+			<groupId>com.aegon.util.lang</groupId>
+			<artifactId>lang</artifactId>
 			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.aegon</groupId>
-			<artifactId>customer-service-api</artifactId>
-			<version>1.0</version>
 		</dependency>
 	</dependencies>
 
